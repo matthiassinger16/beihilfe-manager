@@ -1,9 +1,16 @@
+beihilfe:
+  # Holds the database and the uploaded scans; override with BEIHILFE_DATA_DIR.
+  data-dir: ${BEIHILFE_DATA_DIR:./data}
+
+server:
+  mime-mappings:
+    webmanifest: application/manifest+json
+
 spring:
   application:
     name: beihilfe-manager
   datasource:
-    # File-based database; override with BEIHILFE_DB_PATH to keep it somewhere else.
-    url: jdbc:h2:file:${BEIHILFE_DB_PATH:./data/beihilfe};AUTO_SERVER=TRUE
+    url: jdbc:h2:file:${beihilfe.data-dir}/beihilfe
     username: sa
     password: ""
   jpa:
@@ -13,3 +20,7 @@ spring:
   mvc:
     problemdetails:
       enabled: true
+  servlet:
+    multipart:
+      max-file-size: 25MB
+      max-request-size: 25MB

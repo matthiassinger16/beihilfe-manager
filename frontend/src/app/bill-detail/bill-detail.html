@@ -1,5 +1,11 @@
 <a routerLink="/" class="back-link">← All bills</a>
 
+@if (uploadFailed()) {
+  <p class="alert alert--error" role="alert">
+    The bill was saved, but not all scans could be uploaded. Please add them again below.
+  </p>
+}
+
 @if (error(); as message) {
   <p class="alert alert--error" role="alert">{{ message }}</p>
 }
@@ -92,6 +98,8 @@
       · own share: <strong>{{ bill.amount - reimbursed() | currency }}</strong>
     }
   </p>
+
+  <app-attachment-list [billId]="bill.id" />
 } @else if (!error()) {
   <p class="muted">Loading…</p>
 }

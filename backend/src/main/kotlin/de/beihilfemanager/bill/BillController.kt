@@ -1,5 +1,6 @@
 package de.beihilfemanager.bill
 
+import de.beihilfemanager.attachment.AttachmentService
 import jakarta.validation.Valid
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.DeleteMapping
@@ -14,10 +15,16 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @RequestMapping("/api/bills")
-class BillController(private val service: BillService) {
+class BillController(
+    private val service: BillService,
+    private val attachments: AttachmentService,
+) {
 
     @GetMapping
-    fun list(): List<BillResponse> = service.findAll().map { it.toResponse() }
+    fun list(): List<BillResponse> {
+        val counts = attachments.countPerBill()
+        return service.findAll().map { it.toResponse(counts[it.id] ?: 0) }
+    }
 
     @GetMapping("/{id}")
     fun get(@PathVariable id: Long): BillResponse = service.get(id).toResponse()
@@ -45,4 +52,6 @@ class BillController(private val service: BillService) {
     @PutMapping("/{id}/beihilfe")
     fun updateBeihilfe(@PathVariable id: Long, @Valid @RequestBody request: ClaimUpdateRequest): BillResponse =
         service.updateClaim(id, Payer.BEIHILFE, request).toResponse()
+
+    private fun Bill.toResponse() = toResponse(attachments.count(requireNotNull(id)))
 }

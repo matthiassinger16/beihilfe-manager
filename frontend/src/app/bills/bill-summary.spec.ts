@@ -18,6 +18,7 @@ function bill(overrides: Partial<Bill> = {}): Bill {
     paidOn: null,
     insurance: claim('NOT_SUBMITTED'),
     beihilfe: claim('NOT_SUBMITTED'),
+    attachmentCount: 0,
     createdAt: '2026-09-01T10:00:00Z',
     ...overrides,
   };

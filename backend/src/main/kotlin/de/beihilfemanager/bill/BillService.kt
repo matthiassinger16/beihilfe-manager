@@ -1,5 +1,6 @@
 package de.beihilfemanager.bill
 
+import de.beihilfemanager.attachment.AttachmentService
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -13,6 +14,7 @@ enum class Payer { INSURANCE, BEIHILFE }
 @Transactional
 class BillService(
     private val repository: BillRepository,
+    private val attachments: AttachmentService,
     private val clock: Clock,
 ) {
     @Transactional(readOnly = true)
@@ -48,7 +50,9 @@ class BillService(
     }
 
     fun delete(id: Long) {
-        repository.delete(get(id))
+        val bill = get(id)
+        attachments.deleteFilesOf(id)
+        repository.delete(bill)
     }
 
     fun setPayment(id: Long, request: PaymentRequest): Bill = get(id).apply {

@@ -453,6 +453,10 @@ label {
   .toolbar__search {
     max-width: none;
   }
+
+  .detail-header__amount {
+    margin-top: 0;
+  }
 }
 
 .empty {
@@ -548,4 +552,147 @@ label {
   color: var(--danger);
   font-size: 0.8rem;
   font-weight: 400;
+}
+
+/* Attachments */
+.attachments {
+  margin-top: 1.25rem;
+}
+
+.attachments .alert,
+.attachments > p {
+  margin: 0.75rem 0 0;
+}
+
+.attachments app-file-picker,
+.form__files app-file-picker {
+  display: block;
+  margin-top: 0.75rem;
+}
+
+.attachment-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: 12px;
+  margin-top: 0.75rem;
+}
+
+.attachment {
+  margin: 0;
+  min-width: 0;
+}
+
+.attachment__preview {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  aspect-ratio: 3 / 4;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg);
+  text-decoration: none;
+}
+
+.attachment__preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.attachment__label {
+  color: var(--muted);
+  font-weight: 700;
+  letter-spacing: 0.05em;
+}
+
+.attachment figcaption {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  margin-top: 0.3rem;
+  font-size: 0.8rem;
+}
+
+.attachment__name {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.icon-button {
+  flex: none;
+  width: 2rem;
+  height: 2rem;
+  border: none;
+  border-radius: 6px;
+  background: none;
+  color: var(--muted);
+  font: inherit;
+  cursor: pointer;
+}
+
+.icon-button:hover:not(:disabled) {
+  background: var(--danger-bg);
+  color: var(--danger);
+}
+
+.form__files {
+  margin: 0 0 1.25rem;
+  padding: 0;
+  border: none;
+}
+
+.form__files legend {
+  padding: 0;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.clip {
+  width: 1rem;
+  height: 1rem;
+  margin-left: 0.3rem;
+  vertical-align: -0.15rem;
+  fill: none;
+  stroke: var(--muted);
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+
+/* File picker buttons are labels wrapping a hidden file input. */
+label.button {
+  flex-direction: row;
+  font-size: inherit;
+}
+
+label.button:focus-within {
+  outline: 2px solid var(--primary);
+  outline-offset: 1px;
+}
+
+label.button.disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* "Take photo" only makes sense on phones and tablets. */
+.touch-only {
+  display: none;
+}
+
+@media (pointer: coarse) {
+  .touch-only {
+    display: inline-flex;
+  }
 }

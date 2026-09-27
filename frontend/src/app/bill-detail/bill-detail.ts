@@ -1,16 +1,26 @@
 import { CurrencyPipe, DatePipe } from '@angular/common';
-import { Component, computed, effect, inject, input, numberAttribute, signal } from '@angular/core';
+import {
+  booleanAttribute,
+  Component,
+  computed,
+  effect,
+  inject,
+  input,
+  numberAttribute,
+  signal,
+} from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { Observable } from 'rxjs';
 import { Bill, ClaimUpdate, isOverdue, Payer, today } from '../bills/bill.model';
 import { reimbursed } from '../bills/bill-summary';
 import { BillsService, errorMessage } from '../bills/bills.service';
 import { StatusBadge } from '../shared/status-badge';
+import { AttachmentList } from './attachment-list';
 import { ClaimCard } from './claim-card';
 
 @Component({
   selector: 'app-bill-detail',
-  imports: [CurrencyPipe, DatePipe, RouterLink, StatusBadge, ClaimCard],
+  imports: [CurrencyPipe, DatePipe, RouterLink, StatusBadge, ClaimCard, AttachmentList],
   templateUrl: './bill-detail.html',
 })
 export class BillDetail {
@@ -19,6 +29,8 @@ export class BillDetail {
 
   /** Bound from the `:id` route parameter. */
   readonly id = input.required({ transform: numberAttribute });
+  /** Set by the new-bill form when the bill was saved but uploading its scans failed. */
+  readonly uploadFailed = input(false, { transform: booleanAttribute });
 
   protected readonly bill = signal<Bill | null>(null);
   protected readonly error = signal<string | null>(null);
