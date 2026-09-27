@@ -1,0 +1,15 @@
+spring:
+  application:
+    name: beihilfe-manager
+  datasource:
+    # File-based database; override with BEIHILFE_DB_PATH to keep it somewhere else.
+    url: jdbc:h2:file:${BEIHILFE_DB_PATH:./data/beihilfe};AUTO_SERVER=TRUE
+    username: sa
+    password: ""
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+  mvc:
+    problemdetails:
+      enabled: true
