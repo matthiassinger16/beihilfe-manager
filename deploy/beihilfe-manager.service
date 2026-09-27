@@ -1,0 +1,20 @@
+# systemd unit for running Beihilfe Manager on a Raspberry Pi (or any Linux box).
+# Install: see "Raspberry Pi" in README.md.
+[Unit]
+Description=Beihilfe Manager
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+User=beihilfe
+# Database and scans live here; systemd creates it owned by the service user.
+StateDirectory=beihilfe-manager
+Environment=BEIHILFE_DATA_DIR=/var/lib/beihilfe-manager
+ExecStart=/usr/bin/java -Xmx256m -jar /opt/beihilfe-manager/beihilfe-manager.jar
+# The JVM exits with 143 on SIGTERM, which is a normal stop.
+SuccessExitStatus=143
+Restart=on-failure
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target

@@ -48,14 +48,15 @@
       <label class="form__field">
         Amount (€) *
         <input
-          type="number"
-          min="0.01"
-          step="0.01"
+          type="text"
+          inputmode="decimal"
+          placeholder="e.g. 184,62"
+          autocomplete="off"
           formControlName="amount"
           [class.invalid]="invalid('amount')"
         />
         @if (invalid('amount')) {
-          <span class="form__error">Please enter an amount greater than 0.</span>
+          <span class="form__error">Please enter an amount greater than 0, e.g. 184,62.</span>
         }
       </label>
 
@@ -69,9 +70,50 @@
       </label>
     </div>
 
+    @if (billId() === null) {
+      <fieldset class="form__files">
+        <legend>Scans &amp; photos</legend>
+        @if (pendingFiles().length) {
+          <div class="attachment-grid">
+            @for (pending of pendingFiles(); track pending) {
+              <figure class="attachment">
+                <div class="attachment__preview">
+                  @if (pending.preview) {
+                    <img [src]="pending.preview" alt="" />
+                  } @else {
+                    <span class="attachment__label">{{
+                      fileLabel(pending.file.name, pending.file.type)
+                    }}</span>
+                  }
+                </div>
+                <figcaption>
+                  <span class="attachment__name" [title]="pending.file.name">{{
+                    pending.file.name
+                  }}</span>
+                  <button
+                    type="button"
+                    class="icon-button"
+                    [attr.aria-label]="'Remove ' + pending.file.name"
+                    (click)="removeFile(pending)"
+                  >
+                    ✕
+                  </button>
+                </figcaption>
+              </figure>
+            }
+          </div>
+        }
+        <app-file-picker [disabled]="saving()" (picked)="addFiles($event)" />
+      </fieldset>
+    }
+
     <div class="button-row">
       <button type="submit" class="button button--primary" [disabled]="saving()">
-        {{ billId() === null ? 'Add bill' : 'Save changes' }}
+        @if (saving()) {
+          Saving…
+        } @else {
+          {{ billId() === null ? 'Add bill' : 'Save changes' }}
+        }
       </button>
       <a [routerLink]="billId() === null ? '/' : ['/bills', billId()]" class="button">Cancel</a>
     </div>

@@ -1,5 +1,6 @@
 import { CurrencyPipe, DatePipe } from '@angular/common';
-import { Component, input, linkedSignal, output } from '@angular/core';
+import { Component, computed, input, linkedSignal, output } from '@angular/core';
+import { parseAmount } from '../bills/amount';
 import { Claim, ClaimUpdate, today } from '../bills/bill.model';
 import { StatusBadge } from '../shared/status-badge';
 
@@ -42,13 +43,16 @@ import { StatusBadge } from '../shared/status-badge';
             <label>
               Amount received
               <input
-                type="number"
-                min="0"
-                step="0.01"
-                placeholder="optional"
-                [value]="amount() ?? ''"
-                (input)="amount.set(parseAmount($any($event.target).value))"
+                type="text"
+                inputmode="decimal"
+                placeholder="optional, e.g. 48,07"
+                [class.invalid]="amountInvalid()"
+                [value]="amount()"
+                (input)="amount.set($any($event.target).value)"
               />
+              @if (amountInvalid()) {
+                <span class="form__error">Please enter an amount like 48,07.</span>
+              }
             </label>
             <div class="button-row">
               <button
@@ -107,29 +111,25 @@ export class ClaimCard {
 
   // Reset the inputs whenever the claim changes (e.g. after a successful update).
   protected readonly date = linkedSignal({ source: this.claim, computation: () => today() });
-  protected readonly amount = linkedSignal<Claim, number | null>({
-    source: this.claim,
-    computation: () => null,
-  });
+  protected readonly amount = linkedSignal({ source: this.claim, computation: () => '' });
+  protected readonly amountInvalid = computed(
+    () => this.amount().trim() !== '' && parseAmount(this.amount()) === null,
+  );
 
   protected submit(): void {
     this.changed.emit({ status: 'SUBMITTED', date: this.date() || null });
   }
 
   protected decide(status: 'RECEIVED' | 'DENIED'): void {
+    if (status === 'RECEIVED' && this.amountInvalid()) return;
     this.changed.emit({
       status,
       date: this.date() || null,
-      reimbursedAmount: status === 'RECEIVED' ? this.amount() : null,
+      reimbursedAmount: status === 'RECEIVED' ? parseAmount(this.amount()) : null,
     });
   }
 
   protected reopen(): void {
     this.changed.emit({ status: 'SUBMITTED', date: this.claim().submittedOn });
-  }
-
-  protected parseAmount(value: string): number | null {
-    const amount = Number.parseFloat(value);
-    return Number.isFinite(amount) ? amount : null;
   }
 }

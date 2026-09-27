@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+
 plugins {
     kotlin("jvm")
     kotlin("plugin.spring")
@@ -9,9 +11,15 @@ plugins {
 group = "de.beihilfemanager"
 version = "0.0.1-SNAPSHOT"
 
+// Java 17 bytecode so the jar also runs on Raspberry Pi OS Bookworm, which ships OpenJDK 17.
+java {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+}
+
 kotlin {
-    jvmToolchain(21)
     compilerOptions {
+        jvmTarget.set(JvmTarget.JVM_17)
         freeCompilerArgs.addAll("-Xjsr305=strict", "-Xannotation-default-target=param-property")
     }
 }
@@ -55,7 +63,12 @@ tasks.withType<Test> {
 }
 
 // Bundle the Angular app into the executable jar so a single `java -jar` serves UI and API.
+tasks.jar {
+    enabled = false
+}
+
 tasks.bootJar {
+    archiveFileName.set("beihilfe-manager.jar")
     from(frontendDist) {
         into("BOOT-INF/classes/static")
     }

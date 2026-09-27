@@ -62,12 +62,13 @@ data class BillResponse(
     val paidOn: LocalDate?,
     val insurance: ClaimResponse,
     val beihilfe: ClaimResponse,
+    val attachmentCount: Int,
     val createdAt: Instant,
 )
 
 fun Claim.toResponse() = ClaimResponse(status, submittedOn, decidedOn, reimbursedAmount)
 
-fun Bill.toResponse() = BillResponse(
+fun Bill.toResponse(attachmentCount: Int) = BillResponse(
     id = requireNotNull(id),
     doctor = doctor,
     patient = patient,
@@ -79,5 +80,6 @@ fun Bill.toResponse() = BillResponse(
     paidOn = paidOn,
     insurance = insurance.toResponse(),
     beihilfe = beihilfe.toResponse(),
+    attachmentCount = attachmentCount,
     createdAt = createdAt,
 )

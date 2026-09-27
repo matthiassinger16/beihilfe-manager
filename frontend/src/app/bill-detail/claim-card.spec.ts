@@ -43,7 +43,7 @@ describe('ClaimCard', () => {
     const [date, amount] = element.querySelectorAll('input');
     date.value = '2026-09-20';
     date.dispatchEvent(new Event('input'));
-    amount.value = '42.5';
+    amount.value = '42,50';
     amount.dispatchEvent(new Event('input'));
     button('Received').click();
 

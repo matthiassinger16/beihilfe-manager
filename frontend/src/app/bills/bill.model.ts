@@ -22,7 +22,19 @@ export interface Bill {
   paidOn: string | null;
   insurance: Claim;
   beihilfe: Claim;
+  attachmentCount: number;
   createdAt: string;
+}
+
+/** A scan or photo of a bill. */
+export interface Attachment {
+  id: number;
+  billId: number;
+  filename: string;
+  contentType: string;
+  size: number;
+  createdAt: string;
+  url: string;
 }
 
 export interface BillRequest {

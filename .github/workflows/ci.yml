@@ -27,5 +27,5 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: beihilfe-manager
-          path: backend/build/libs/backend-*-SNAPSHOT.jar
+          path: backend/build/libs/beihilfe-manager.jar
           if-no-files-found: error
