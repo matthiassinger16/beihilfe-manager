@@ -1,0 +1,12 @@
+# Gradle / Kotlin
+.gradle/
+build/
+.kotlin/
+!gradle/wrapper/gradle-wrapper.jar
+
+# Local H2 database
+data/
+
+# IDEs
+.idea/
+*.iml

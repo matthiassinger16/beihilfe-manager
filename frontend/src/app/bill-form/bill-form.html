@@ -1,0 +1,92 @@
+<a [routerLink]="billId() === null ? '/' : ['/bills', billId()]" class="back-link">← Back</a>
+
+<h1>{{ billId() === null ? 'New bill' : 'Edit bill' }}</h1>
+
+@if (error(); as message) {
+  <p class="alert alert--error" role="alert">{{ message }}</p>
+}
+
+@if (loaded()) {
+  <form class="card form" [formGroup]="form" (ngSubmit)="save()" novalidate>
+    <div class="form__grid">
+      <label class="form__field form__field--wide">
+        Doctor / practice *
+        <input
+          formControlName="doctor"
+          list="doctors"
+          autocomplete="off"
+          [class.invalid]="invalid('doctor')"
+        />
+        @if (invalid('doctor')) {
+          <span class="form__error">Please enter who issued the bill.</span>
+        }
+      </label>
+
+      <label class="form__field">
+        Patient
+        <input formControlName="patient" list="patients" autocomplete="off" />
+      </label>
+
+      <label class="form__field">
+        Invoice number
+        <input formControlName="invoiceNumber" autocomplete="off" />
+      </label>
+
+      <label class="form__field">
+        Invoice date *
+        <input type="date" formControlName="invoiceDate" [class.invalid]="invalid('invoiceDate')" />
+        @if (invalid('invoiceDate')) {
+          <span class="form__error">Please enter the invoice date.</span>
+        }
+      </label>
+
+      <label class="form__field">
+        Due date
+        <input type="date" formControlName="dueDate" />
+      </label>
+
+      <label class="form__field">
+        Amount (€) *
+        <input
+          type="number"
+          min="0.01"
+          step="0.01"
+          formControlName="amount"
+          [class.invalid]="invalid('amount')"
+        />
+        @if (invalid('amount')) {
+          <span class="form__error">Please enter an amount greater than 0.</span>
+        }
+      </label>
+
+      <label class="form__field form__field--wide">
+        Notes
+        <textarea
+          formControlName="description"
+          rows="3"
+          placeholder="e.g. treatment, GOÄ items…"
+        ></textarea>
+      </label>
+    </div>
+
+    <div class="button-row">
+      <button type="submit" class="button button--primary" [disabled]="saving()">
+        {{ billId() === null ? 'Add bill' : 'Save changes' }}
+      </button>
+      <a [routerLink]="billId() === null ? '/' : ['/bills', billId()]" class="button">Cancel</a>
+    </div>
+  </form>
+
+  <datalist id="doctors">
+    @for (doctor of doctors(); track doctor) {
+      <option [value]="doctor"></option>
+    }
+  </datalist>
+  <datalist id="patients">
+    @for (patient of patients(); track patient) {
+      <option [value]="patient"></option>
+    }
+  </datalist>
+} @else if (!error()) {
+  <p class="muted">Loading…</p>
+}

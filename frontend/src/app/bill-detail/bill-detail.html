@@ -1,0 +1,97 @@
+<a routerLink="/" class="back-link">← All bills</a>
+
+@if (error(); as message) {
+  <p class="alert alert--error" role="alert">{{ message }}</p>
+}
+
+@if (bill(); as bill) {
+  <div class="detail-header">
+    <div>
+      <h1>{{ bill.doctor }}</h1>
+      <p class="muted">
+        Invoice {{ bill.invoiceNumber || 'without number' }} from
+        {{ bill.invoiceDate | date: 'mediumDate' }}
+        @if (bill.patient) {
+          · for {{ bill.patient }}
+        }
+      </p>
+    </div>
+    <div class="detail-header__amount">{{ bill.amount | currency }}</div>
+  </div>
+
+  @if (bill.description) {
+    <p class="description">{{ bill.description }}</p>
+  }
+
+  <div class="button-row">
+    <a [routerLink]="['/bills', bill.id, 'edit']" class="button">Edit</a>
+    <button
+      type="button"
+      class="button button--danger-outline"
+      [disabled]="busy()"
+      (click)="remove()"
+    >
+      Delete
+    </button>
+  </div>
+
+  <div class="tracks">
+    <section class="card track">
+      <header class="track__header">
+        <h2>Payment</h2>
+        <app-status-badge [status]="bill.paidOn ? 'PAID' : overdue() ? 'OVERDUE' : 'UNPAID'" />
+      </header>
+      @if (bill.paidOn) {
+        <p>Paid on {{ bill.paidOn | date: 'mediumDate' }}.</p>
+        <button type="button" class="link-button" [disabled]="busy()" (click)="markUnpaid()">
+          Undo: mark as unpaid
+        </button>
+      } @else {
+        <p [class.text-danger]="overdue()">
+          @if (bill.dueDate) {
+            Due {{ bill.dueDate | date: 'mediumDate' }}.
+          } @else {
+            Not paid yet.
+          }
+        </p>
+        <div class="track__form">
+          <label>
+            Paid on
+            <input type="date" [value]="paidOn()" (input)="paidOn.set($any($event.target).value)" />
+          </label>
+          <button
+            type="button"
+            class="button button--primary"
+            [disabled]="busy()"
+            (click)="markPaid()"
+          >
+            Mark as paid
+          </button>
+        </div>
+      }
+    </section>
+
+    <app-claim-card
+      title="Insurance"
+      [claim]="bill.insurance"
+      [busy]="busy()"
+      (changed)="updateClaim('insurance', $event)"
+    />
+    <app-claim-card
+      title="Beihilfe"
+      [claim]="bill.beihilfe"
+      [busy]="busy()"
+      (changed)="updateClaim('beihilfe', $event)"
+    />
+  </div>
+
+  <p class="muted totals">
+    Reimbursed so far: <strong>{{ reimbursed() | currency }}</strong> of
+    {{ bill.amount | currency }}
+    @if (settled()) {
+      · own share: <strong>{{ bill.amount - reimbursed() | currency }}</strong>
+    }
+  </p>
+} @else if (!error()) {
+  <p class="muted">Loading…</p>
+}

@@ -1,0 +1,117 @@
+<h1>Bills</h1>
+
+@if (error(); as message) {
+  <p class="alert alert--error" role="alert">{{ message }}</p>
+}
+
+@if (bills(); as allBills) {
+  <section class="summary" aria-label="Summary">
+    <div class="summary__card">
+      <span class="summary__label">To pay</span>
+      <span class="summary__value">{{ summary().unpaidAmount | currency }}</span>
+      <span class="summary__hint">
+        {{ summary().unpaidCount }} unpaid
+        @if (summary().overdueCount) {
+          · <strong class="text-danger">{{ summary().overdueCount }} overdue</strong>
+        }
+      </span>
+    </div>
+    <div class="summary__card">
+      <span class="summary__label">Awaiting insurance</span>
+      <span class="summary__value">{{ summary().insurance.pendingAmount | currency }}</span>
+      <span class="summary__hint">
+        {{ summary().insurance.pendingCount }} sent · {{ summary().insurance.toSubmitCount }} not
+        sent yet
+      </span>
+    </div>
+    <div class="summary__card">
+      <span class="summary__label">Awaiting Beihilfe</span>
+      <span class="summary__value">{{ summary().beihilfe.pendingAmount | currency }}</span>
+      <span class="summary__hint">
+        {{ summary().beihilfe.pendingCount }} sent · {{ summary().beihilfe.toSubmitCount }} not sent
+        yet
+      </span>
+    </div>
+    <div class="summary__card">
+      <span class="summary__label">Reimbursed</span>
+      <span class="summary__value">{{ summary().reimbursedAmount | currency }}</span>
+      <span class="summary__hint">from insurance and Beihilfe</span>
+    </div>
+  </section>
+
+  <div class="toolbar">
+    <div class="segmented" role="group" aria-label="Filter bills">
+      @for (option of filters; track option.value) {
+        <button
+          type="button"
+          [class.active]="filter() === option.value"
+          [attr.aria-pressed]="filter() === option.value"
+          (click)="filter.set(option.value)"
+        >
+          {{ option.label }}
+        </button>
+      }
+    </div>
+    <input
+      type="search"
+      class="toolbar__search"
+      placeholder="Search doctor, patient, invoice…"
+      aria-label="Search bills"
+      [value]="search()"
+      (input)="search.set($any($event.target).value)"
+    />
+  </div>
+
+  @if (allBills.length === 0) {
+    <div class="empty">
+      <p>No bills yet.</p>
+      <a routerLink="/bills/new" class="button button--primary">Add your first bill</a>
+    </div>
+  } @else if (visibleBills().length === 0) {
+    <p class="empty">No bills match the current filter.</p>
+  } @else {
+    <div class="table-wrapper">
+      <table class="bill-table">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Doctor</th>
+            <th class="numeric">Amount</th>
+            <th>Payment</th>
+            <th>Insurance</th>
+            <th>Beihilfe</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (bill of visibleBills(); track bill.id) {
+            <tr (click)="open(bill)">
+              <td class="cell-date">{{ bill.invoiceDate | date: 'mediumDate' }}</td>
+              <td class="cell-doctor">
+                <a [routerLink]="['/bills', bill.id]" (click)="$event.stopPropagation()">{{
+                  bill.doctor
+                }}</a>
+                @if (bill.patient) {
+                  <div class="muted">{{ bill.patient }}</div>
+                }
+              </td>
+              <td class="numeric cell-amount">{{ bill.amount | currency }}</td>
+              <td class="cell-status" data-label="Payment">
+                <app-status-badge
+                  [status]="bill.paidOn ? 'PAID' : isOverdue(bill) ? 'OVERDUE' : 'UNPAID'"
+                />
+              </td>
+              <td class="cell-status" data-label="Insurance">
+                <app-status-badge [status]="bill.insurance.status" />
+              </td>
+              <td class="cell-status" data-label="Beihilfe">
+                <app-status-badge [status]="bill.beihilfe.status" />
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+} @else if (!error()) {
+  <p class="muted">Loading…</p>
+}
